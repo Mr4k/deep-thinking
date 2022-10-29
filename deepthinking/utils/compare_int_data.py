@@ -12,7 +12,7 @@ def convert_bits_to_int(bits):
     num = 0
     for b in bits:
         num << 1
-        num += b
+        num += int(b)
     return num
 
 class CompareIntDataset(torch.utils.data.Dataset):
@@ -20,17 +20,18 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
     def __init__(self, root: str, num_bits: int = 32) -> None:
         num_examples = 10000
-        self.inputs = torch.randint(0, 2, (num_examples, 2, num_bits))
+        self.inputs = torch.randint(0, 2, (num_examples, 2, num_bits), dtype=torch.float)
 
         targets = []
         for i in range(num_examples):
-            a = self.inputs[i][0]
-            b = self.inputs[i][1]
+            a = self.inputs[i][0].clone()
+            b = self.inputs[i][1].clone()
             if convert_bits_to_int(a) < convert_bits_to_int(b):
-                self.targets.append(torch.stack([a, b]))
+                targets.append(torch.stack([a, b]))
             else:
-                self.targets.append(torch.stack([b, a]))
+                targets.append(torch.stack([b, a]))
         self.targets = targets
+        print("sszzz", self.targets[0].size())
     
     def __getitem__(self, index):
         return self.inputs[index], self.targets[index]

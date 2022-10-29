@@ -30,10 +30,12 @@ class DTNet1D(nn.Module):
         self.recall = recall
         self.group_norm = group_norm
 
-        proj_conv = nn.Conv1d(1, width, kernel_size=3,
+        input_channels = 2
+
+        proj_conv = nn.Conv1d(input_channels, width, kernel_size=3,
                               stride=1, padding=1, bias=False)
 
-        conv_recall = nn.Conv1d(width + 1, width, kernel_size=3,
+        conv_recall = nn.Conv1d(width + input_channels, width, kernel_size=3,
                                 stride=1, padding=1, bias=False)
 
         if self.recall:
@@ -66,7 +68,9 @@ class DTNet1D(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, iters_to_do, interim_thought=None, **kwargs):
+        print("fwwwd:", x.size(), x.dtype)
         initial_thought = self.projection(x)
+        print("initial thoughtt:", initial_thought.size())
 
         if interim_thought is None:
             interim_thought = initial_thought
@@ -76,8 +80,9 @@ class DTNet1D(nn.Module):
         for i in range(iters_to_do):
             if self.recall:
                 interim_thought = torch.cat([interim_thought, x], 1)
-
+            print("initial thoughtti:", initial_thought.size())
             interim_thought = self.recur_block(interim_thought)
+            print("initial thoughttihhh:", initial_thought.size())
             out = self.head(interim_thought)
             all_outputs[:, i] = out
 
