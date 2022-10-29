@@ -1,0 +1,10 @@
+defaults:
+  - hyp: compare_int_default
+  - model: dt_net_recall_2d
+
+name: compare_int
+test_data: 512
+train_data: 32
+
+model:
+  width: 300

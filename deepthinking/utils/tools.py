@@ -21,6 +21,7 @@ import deepthinking.models as models
 from .mazes_data import prepare_maze_loader
 from .prefix_sums_data import prepare_prefix_loader
 from .chess_data import prepare_chess_loader
+from .compare_int_data import prepare_compare_int_loader
 from .. import adjectives, names
 
 from .warmup import ExponentialWarmup, LinearWarmup
@@ -50,6 +51,11 @@ def get_dataloaders(problem_args):
                                    test_data=problem_args.test_data)
     elif problem_args.name == "chess":
         return prepare_chess_loader(train_batch_size=problem_args.hyp.train_batch_size,
+                                    test_batch_size=problem_args.hyp.test_batch_size,
+                                    train_data=problem_args.train_data,
+                                    test_data=problem_args.test_data)
+    elif problem_args.name == "compare_int":
+        return prepare_compare_int_loader(train_batch_size=problem_args.hyp.train_batch_size,
                                     test_batch_size=problem_args.hyp.test_batch_size,
                                     train_data=problem_args.train_data,
                                     test_data=problem_args.test_data)
