@@ -30,12 +30,10 @@ class DTNet1D(nn.Module):
         self.recall = recall
         self.group_norm = group_norm
 
-        self.input_channels = 2
-
-        proj_conv = nn.Conv1d(self.input_channels, width, kernel_size=3,
+        proj_conv = nn.Conv1d(1, width, kernel_size=3,
                               stride=1, padding=1, bias=False)
 
-        conv_recall = nn.Conv1d(width + self.input_channels, width, kernel_size=3,
+        conv_recall = nn.Conv1d(width + 1, width, kernel_size=3,
                                 stride=1, padding=1, bias=False)
 
         if self.recall:
@@ -50,7 +48,7 @@ class DTNet1D(nn.Module):
                                stride=1, padding=1, bias=False)
         head_conv2 = nn.Conv1d(width, int(width/2), kernel_size=3,
                                stride=1, padding=1, bias=False)
-        head_conv3 = nn.Conv1d(int(width/2), 2 * self.input_channels, kernel_size=3,
+        head_conv3 = nn.Conv1d(int(width/2), 2, kernel_size=3,
                                stride=1, padding=1, bias=False)
 
         self.projection = nn.Sequential(proj_conv, nn.ReLU())
@@ -68,30 +66,22 @@ class DTNet1D(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, iters_to_do, interim_thought=None, **kwargs):
-        #print("fwwwd:", x.size(), x.dtype)
         initial_thought = self.projection(x)
-        #print("initial thoughtt:", initial_thought.size())
 
         if interim_thought is None:
             interim_thought = initial_thought
 
-        #all_outputs = torch.zeros((x.size(0), iters_to_do, 2, x.size(2))).to(x.device)
-        all_outputs = torch.zeros((x.size(0), iters_to_do, 2, x.size(1), x.size(2))).to(x.device)
+        all_outputs = torch.zeros((x.size(0), iters_to_do, 2, x.size(2))).to(x.device)
 
         for i in range(iters_to_do):
             if self.recall:
                 interim_thought = torch.cat([interim_thought, x], 1)
-            #print("initial thoughtti:", initial_thought.size())
+
             interim_thought = self.recur_block(interim_thought)
-            #print("initial thoughttihhh:", initial_thought.size())
             out = self.head(interim_thought)
-            out = out.view(x.size(0), 2, x.size(1), x.size(2))
-            #print("zsssa:", out.size(), all_outputs.size())
             all_outputs[:, i] = out
 
         if self.training:
-            #out = out.view(out.size(0), -1)
-            #print("out:", out.size())
             return out, interim_thought
 
         return all_outputs

@@ -23,7 +23,7 @@ from .blocks import BasicBlock2D as BasicBlock
 class DTNet(nn.Module):
     """DeepThinking Network 2D model class"""
 
-    def __init__(self, block, num_blocks, width, in_channels=1, recall=True, group_norm=False, **kwargs):
+    def __init__(self, block, num_blocks, width, in_channels=3, recall=True, group_norm=False, **kwargs):
         super().__init__()
 
         self.recall = recall
@@ -64,9 +64,7 @@ class DTNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, iters_to_do, interim_thought=None, **kwargs):
-        print("fwd:", x.size())
         initial_thought = self.projection(x)
-        print("inital thought:", initial_thought.size())
 
         if interim_thought is None:
             interim_thought = initial_thought
