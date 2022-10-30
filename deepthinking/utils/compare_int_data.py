@@ -22,12 +22,12 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
     def __init__(self, root: str, num_bits: int = 32) -> None:
         num_examples = 10000
-        self.inputs = torch.randint(0, 2, (num_examples, 2, num_bits), dtype=torch.long)
+        self.inputs = torch.randint(0, 2, (num_examples, 1, 2, num_bits), dtype=torch.long)
 
         targets = []
         for i in range(num_examples):
-            a = self.inputs[i][0].clone()
-            b = self.inputs[i][1].clone()
+            a = self.inputs[i][0][0].clone()
+            b = self.inputs[i][0][1].clone()
             if convert_bits_to_int(a) < convert_bits_to_int(b):
                 targets.append(torch.stack([a, b]))
             else:

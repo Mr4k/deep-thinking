@@ -23,12 +23,13 @@ from .blocks import BasicBlock2D as BasicBlock
 class DTNet(nn.Module):
     """DeepThinking Network 2D model class"""
 
-    def __init__(self, block, num_blocks, width, in_channels=3, recall=True, group_norm=False, **kwargs):
+    def __init__(self, block, num_blocks, width, in_channels=1, recall=True, group_norm=False, **kwargs):
         super().__init__()
 
         self.recall = recall
         self.width = int(width)
         self.group_norm = group_norm
+        in_channels = 1
         proj_conv = nn.Conv2d(in_channels, width, kernel_size=3,
                               stride=1, padding=1, bias=False)
 
