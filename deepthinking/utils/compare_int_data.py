@@ -1,6 +1,8 @@
 import torch
 from torch.utils import data
 
+import torch.nn.functional as F
+
 # Ignore statemenst for pylint:
 #     Too many branches (R0912), Too many statements (R0915), No member (E1101),
 #     Not callable (E1102), Invalid name (C0103), No exception (W0702),
@@ -20,7 +22,7 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
     def __init__(self, root: str, num_bits: int = 32) -> None:
         num_examples = 10000
-        self.inputs = torch.randint(0, 2, (num_examples, 2, num_bits), dtype=torch.float)
+        self.inputs = torch.randint(0, 2, (num_examples, 2, num_bits), dtype=torch.long)
 
         targets = []
         for i in range(num_examples):
@@ -31,6 +33,7 @@ class CompareIntDataset(torch.utils.data.Dataset):
             else:
                 targets.append(torch.stack([b, a]))
         self.targets = targets
+        self.inputs = self.inputs.float()
         print("sszzz", self.targets[0].size())
     
     def __getitem__(self, index):

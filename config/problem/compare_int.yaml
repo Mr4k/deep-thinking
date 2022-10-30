@@ -7,4 +7,4 @@ test_data: 512
 train_data: 32
 
 model:
-  width: 32
+  width: 300

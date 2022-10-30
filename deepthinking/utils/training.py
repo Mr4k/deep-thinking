@@ -95,6 +95,8 @@ def train_progressive(net, loaders, train_setup, device):
         if alpha != 1:
             outputs_max_iters = outputs_max_iters.view(outputs_max_iters.size(0),
                                                        outputs_max_iters.size(1), -1)
+            #outputs_max_iters = outputs_max_iters.view(outputs_max_iters.size(0), -1)
+            #print("o, t:", outputs_max_iters.size(), targets.size(), outputs_max_iters.dtype, targets.dtype)
             loss_max_iters = criterion(outputs_max_iters, targets)
         else:
             loss_max_iters = torch.zeros_like(targets).float()
@@ -104,6 +106,8 @@ def train_progressive(net, loaders, train_setup, device):
         if alpha != 0:
             outputs, k = get_output_for_prog_loss(inputs, max_iters, net)
             outputs = outputs.view(outputs.size(0), outputs.size(1), -1)
+            #outputs = outputs.view(outputs.size(0), -1)
+            #print("o, t:", outputs_max_iters.size(), targets.size(), outputs_max_iters.dtype, targets.dtype)
             loss_progressive = criterion(outputs, targets)
         else:
             loss_progressive = torch.zeros_like(targets).float()
