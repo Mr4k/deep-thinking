@@ -47,7 +47,11 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
             for j, num in enumerate(sorted_nums):
                 self.targets[i, 0, j] = torch.tensor(convert_int_to_bits(num, num_bits))
-            
+
+            print("inputs:\n", self.inputs[i, 0])
+            print("targets:\n", self.targets[i, 0])
+        
+
         self.inputs = self.inputs.float()
     
     def __getitem__(self, index):
