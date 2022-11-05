@@ -43,7 +43,7 @@ class CompareIntDataset(torch.utils.data.Dataset):
             sorted_nums, _ = torch.sort(nums)
 
             for j, num in enumerate(nums):
-                self.inputs[i, 0, j] = torch.tensor(convert_int_to_bits(num, num_bits))
+                self.inputs[i, 0, j] = torch.tensor(convert_int_to_bits(num, num_bits)) - 0.5
 
             for j, num in enumerate(sorted_nums):
                 self.targets[i, 0, j] = torch.tensor(convert_int_to_bits(num, num_bits))
