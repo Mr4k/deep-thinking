@@ -1,3 +1,4 @@
+import math
 import torch
 from torch.utils import data
 
@@ -13,28 +14,41 @@ import torch.nn.functional as F
 def convert_bits_to_int(bits):
     num = 0
     for b in bits:
-        num << 1
+        num = num << 1
         num += int(b)
     return num
+
+def convert_int_to_bits(num, num_bits = 8):
+    bits = []
+    curr_num = num
+    for _ in range(num_bits):
+        bits.append(curr_num % 2)
+        curr_num = curr_num >> 1
+    bits.reverse()
+    assert convert_bits_to_int(bits) == num
+    return bits
 
 class CompareIntDataset(torch.utils.data.Dataset):
     base_folder = "compare_int_data"
 
-    def __init__(self, root: str, num_bits: int = 32) -> None:
+    def __init__(self, root: str, num_items: int = 8) -> None:
         num_examples = 10000
-        self.inputs = torch.randint(0, 2, (num_examples, 1, 2, num_bits), dtype=torch.long)
-
-        targets = []
+        num_bits = 10
+        self.inputs = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
+        self.targets = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
+        
         for i in range(num_examples):
-            a = self.inputs[i][0][0].clone()
-            b = self.inputs[i][0][1].clone()
-            if convert_bits_to_int(a) < convert_bits_to_int(b):
-                targets.append(torch.stack([a, b]))
-            else:
-                targets.append(torch.stack([b, a]))
-        self.targets = targets
+            MAX_NUM = math.pow(2, num_bits) - 1
+            nums = torch.randint(0, int(MAX_NUM), (num_items,))
+            sorted_nums, _ = torch.sort(nums)
+
+            for j, num in enumerate(nums):
+                self.inputs[i, 0, j] = torch.tensor(convert_int_to_bits(num, num_bits))
+
+            for j, num in enumerate(sorted_nums):
+                self.targets[i, 0, j] = torch.tensor(convert_int_to_bits(num, num_bits))
+            
         self.inputs = self.inputs.float()
-        print("sszzz", self.targets[0].size())
     
     def __getitem__(self, index):
         return self.inputs[index], self.targets[index]
@@ -49,8 +63,8 @@ class CompareIntDataset(torch.utils.data.Dataset):
 def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, test_data,
                           train_split=0.8, shuffle=True):
 
-    dataset = CompareIntDataset("../../../data", num_bits=train_data)
-    testset = CompareIntDataset("../../../data", num_bits=test_data)
+    dataset = CompareIntDataset("../../../data", num_items=train_data)
+    testset = CompareIntDataset("../../../data", num_items=test_data)
 
     train_split = int(train_split * len(dataset))
 
