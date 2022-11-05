@@ -1,7 +1,7 @@
 alpha: 0.5
 clip:
 epochs: 1000
-lr: 0.001
+lr: 0.01
 lr_decay: step
 lr_factor: 0.1
 lr_schedule:
@@ -9,9 +9,9 @@ lr_schedule:
 lr_throttle: True
 optimizer: adam
 save_period: -1
-test_batch_size: 25
+test_batch_size: 100
 test_mode: default
-train_batch_size: 50
+train_batch_size: 100
 train_mode: progressive
-val_period: 200
+val_period: 100
 warmup_period: 10
