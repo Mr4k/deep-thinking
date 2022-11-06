@@ -33,13 +33,17 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
     def __init__(self, root: str, num_items: int = 8) -> None:
         num_examples = 10000
-        num_bits = 10
+        # with 4 bits
+        # 8! * (16 choose 8) inputs = a lot
+        # (16 choose 8) solutions = 12870
+        num_bits = 4
         self.inputs = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
         self.targets = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
         
+        MAX_NUM = math.pow(2, num_bits) - 1
+        ones = torch.ones((int(MAX_NUM),))
         for i in range(num_examples):
-            MAX_NUM = math.pow(2, num_bits) - 1
-            nums = torch.randint(0, int(MAX_NUM), (num_items,))
+            nums = torch.multinomial(ones, num_items)
             sorted_nums, _ = torch.sort(nums)
 
             for j, num in enumerate(nums):
