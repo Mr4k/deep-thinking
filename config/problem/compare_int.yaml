@@ -7,8 +7,8 @@ test_data: 64
 train_data: 8
 
 model:
-  width: 256
-  max_iters: 60
+  width: 128
+  max_iters: 50
   test_iterations:
-    low: 60
+    low: 50
     high: 300
