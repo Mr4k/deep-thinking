@@ -1,7 +1,7 @@
 alpha: 0.5
 clip:
 epochs: 1000
-lr: 0.01
+lr: 0.001
 lr_decay: step
 lr_factor: 0.1
 lr_schedule:
