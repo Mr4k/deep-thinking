@@ -14,6 +14,7 @@ import logging
 import os
 import sys
 from collections import OrderedDict
+import wandb
 
 import hydra
 import numpy as np
@@ -35,12 +36,22 @@ import deepthinking.utils.logging_utils as lg
 
 @hydra.main(config_path="config", config_name="train_model_config")
 def main(cfg: DictConfig):
+    wandb.config = OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True
+    )
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.backends.cudnn.benchmark = True
     log = logging.getLogger()
     log.info("\n_________________________________________________\n")
     log.info("train_model.py main() running.")
     log.info(OmegaConf.to_yaml(cfg))
+
+    _ = wandb.init(
+        entity=cfg.wandb.entity,
+        project=cfg.wandb.project,
+        settings=wandb.Settings(start_method="thread"),
+        config=wandb.config)
+
 
     cfg.problem.model.test_iterations = list(range(cfg.problem.model.test_iterations["low"],
                                                    cfg.problem.model.test_iterations["high"] + 1))
@@ -87,6 +98,7 @@ def main(cfg: DictConfig):
         log.info(f"Training loss at epoch {epoch}: {loss}")
         log.info(f"Training accuracy at epoch {epoch}: {acc}")
         log.info(f"Val accuracy at epoch {epoch}: {val_acc}")
+        wandb.log({"epoch": epoch, "loss": loss, "train_acc": acc, "val_acc": val_acc})
 
         # if the loss is nan, then stop the training
         if np.isnan(float(loss)):
@@ -115,6 +127,7 @@ def main(cfg: DictConfig):
             log.info(f"Training accuracy: {train_acc}")
             log.info(f"Val accuracy: {val_acc}")
             log.info(f"Test accuracy (hard data): {test_acc}")
+            wandb.log({"train_acc": acc, "val_acc": val_acc, "test_acc_hard": test_acc})
 
             tb_last = cfg.problem.model.test_iterations[-1]
             lg.write_to_tb([train_acc[tb_last], val_acc[tb_last], test_acc[tb_last]],

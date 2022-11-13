@@ -1,4 +1,4 @@
-alpha: 0.5
+alpha: 1
 clip:
 epochs: 1000
 lr: 0.001

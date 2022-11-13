@@ -11,5 +11,9 @@ hydra:
       file:
         filename: train.log
 
+wandb:
+  entity: mr4k
+  project: deepthinking-test
+
 train_log: train_log
 name: training_default
