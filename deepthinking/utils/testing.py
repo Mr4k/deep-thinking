@@ -15,7 +15,9 @@ from icecream import ic
 from tqdm import tqdm
 import wandb
 
-from math import prod
+from functools import reduce # Valid in Python 2.6+, required in Python 3
+import operator
+
 
 # Ignore statements for pylint:
 #     Too many branches (R0912), Too many statements (R0915), No member (E1101),
@@ -94,7 +96,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                         sampled_input = inputs[j,0].int()
                         sampled_pred = predicted[j].view(-1, *in_shape)
                         sampled_target = targets[j].view(-1, *in_shape)
-                        percentage_correct_bits = (sampled_pred == sampled_target).sum() / prod(in_shape) * 100
+                        percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
                         reporting_data.append((wandb.Image(sampled_input.numpy()), wandb.Image(sampled_pred.numpy()), wandb.Image(sampled_target.numpy()), percentage_correct_bits, test_type))
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
             test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "labels", "percentage correct bits", "test_type"])
