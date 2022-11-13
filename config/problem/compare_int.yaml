@@ -8,7 +8,7 @@ train_data: 8
 
 model:
   width: 128
-  max_iters: 50
+  max_iters: 50 
   test_iterations:
     low: 50
     high: 300

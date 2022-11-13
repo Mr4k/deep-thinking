@@ -13,6 +13,9 @@ import einops
 import torch
 from icecream import ic
 from tqdm import tqdm
+import wandb
+
+from math import prod
 
 # Ignore statements for pylint:
 #     Too many branches (R0912), Too many statements (R0915), No member (E1101),
@@ -51,6 +54,19 @@ def get_predicted(inputs, outputs, problem):
 
     return predicted
 
+"""def log_eval_result(predicted, targets):
+    my_data = [
+        [0, wandb.Image("img_0.jpg"), 0, 0],
+        [1, wandb.Image("img_1.jpg"), 8, 0],
+        [2, wandb.Image("img_2.jpg"), 7, 1],
+        [3, wandb.Image("img_3.jpg"), 1, 1]
+    ]
+          
+    # create a wandb.Table() with corresponding columns
+    columns=["id", "image", "prediction", "truth"]
+    test_table = wandb.Table(data=my_data, columns=columns)
+    wandb.log(test_table)"""
+
 
 def test_default(net, testloader, iters, problem, device):
     max_iters = max(iters)
@@ -64,12 +80,25 @@ def test_default(net, testloader, iters, problem, device):
 
             all_outputs = net(inputs, iters_to_do=max_iters)
 
+            reporting_data = []
+            batch_size = inputs.shape[0]
+            num_data_pieces_to_report = min(10, batch_size) 
             for i in range(all_outputs.size(1)):
                 outputs = all_outputs[:, i]
                 predicted = get_predicted(inputs, outputs, problem)
                 targets = targets.view(targets.size(0), -1)
-                corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
 
+                if i == all_outputs.size(1) - 1:
+                    for j in range(num_data_pieces_to_report):
+                        in_shape = inputs[j].shape[0:]
+                        sampled_input = inputs[j,0].int()
+                        sampled_pred = predicted[j].view(-1, *in_shape)
+                        sampled_target = targets[j].view(-1, *in_shape)
+                        percentage_correct_bits = (sampled_pred == sampled_target).sum() / prod(in_shape) * 100
+                        reporting_data.append((wandb.Image(sampled_input.numpy()), wandb.Image(sampled_pred.numpy()), wandb.Image(sampled_target.numpy()), percentage_correct_bits))
+                corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
+            test_table = wandb.Table(data=reporting_data, columns=["input", "predicted", "labels", "percentage correct bits"])
+            wandb.log({"sample_outputs": test_table})
             total += targets.size(0)
 
     accuracy = 100.0 * corrects / total
