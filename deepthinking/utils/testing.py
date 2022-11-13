@@ -97,7 +97,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                         sampled_pred = predicted[j].view(-1, *in_shape)
                         sampled_target = targets[j].view(-1, *in_shape)
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
-                        reporting_data.append((wandb.Image(sampled_input.numpy()), wandb.Image(sampled_pred.numpy()), wandb.Image(sampled_target.numpy()), percentage_correct_bits, test_type))
+                        reporting_data.append((wandb.Image(sampled_input.cpu().numpy()), wandb.Image(sampled_pred.cpu().numpy()), wandb.Image(sampled_target.cpu().numpy()), percentage_correct_bits, test_type))
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
             test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "labels", "percentage correct bits", "test_type"])
             wandb.log({"sample_outputs": test_table})
