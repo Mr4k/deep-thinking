@@ -89,7 +89,7 @@ def main(cfg: DictConfig):
 
     for epoch in range(start_epoch, cfg.problem.hyp.epochs):
         loss, acc = dt.train(net, loaders, cfg.problem.hyp.train_mode, train_setup, device)
-        val_acc = dt.test(net, [loaders["val"]], cfg.problem.hyp.test_mode, [cfg.problem.model.max_iters],
+        val_acc = dt.test(net, [(loaders["val"], "val")], cfg.problem.hyp.test_mode, [cfg.problem.model.max_iters],
                           cfg.problem.name, device)[0][cfg.problem.model.max_iters]
         if val_acc > highest_val_acc_so_far:
             best_so_far = True
@@ -117,9 +117,9 @@ def main(cfg: DictConfig):
         # evaluate the model periodically and at the final epoch
         if (epoch + 1) % cfg.problem.hyp.val_period == 0 or epoch + 1 == cfg.problem.hyp.epochs:
             test_acc, val_acc, train_acc = dt.test(net,
-                                                   [loaders["test"],
-                                                    loaders["val"],
-                                                    loaders["train"]],
+                                                   [(loaders["test"], "test"),
+                                                    (loaders["val"], "val"),
+                                                    (loaders["train"], "train")],
                                                    cfg.problem.hyp.test_mode,
                                                    cfg.problem.model.test_iterations,
                                                    cfg.problem.name,
@@ -127,9 +127,14 @@ def main(cfg: DictConfig):
             log.info(f"Training accuracy: {train_acc}")
             log.info(f"Val accuracy: {val_acc}")
             log.info(f"Test accuracy (hard data): {test_acc}")
-            wandb.log({"train_acc": acc, "val_acc": val_acc, "test_acc_hard": test_acc})
-
             tb_last = cfg.problem.model.test_iterations[-1]
+            wandb.log({
+                "eval_epoch": epoch,
+                "eval_train_acc": {tb_last: train_acc[tb_last]},
+                "eval_val_acc": {tb_last: val_acc[tb_last]},
+                "test_acc_hard": {tb_last: test_acc[tb_last]}
+            })
+
             lg.write_to_tb([train_acc[tb_last], val_acc[tb_last], test_acc[tb_last]],
                            ["train_acc", "val_acc", "test_acc"],
                            epoch,

@@ -26,9 +26,9 @@ from math import prod
 
 def test(net, loaders, mode, iters, problem, device):
     accs = []
-    for loader in loaders:
+    for (loader, test_type) in loaders:
         if mode == "default":
-            accuracy = test_default(net, loader, iters, problem, device)
+            accuracy = test_default(net, loader, iters, problem, device, test_type)
         elif mode == "max_conf":
             accuracy = test_max_conf(net, loader, iters, problem, device)
         else:
@@ -68,7 +68,7 @@ def get_predicted(inputs, outputs, problem):
     wandb.log(test_table)"""
 
 
-def test_default(net, testloader, iters, problem, device):
+def test_default(net, testloader, iters, problem, device, test_type):
     max_iters = max(iters)
     net.eval()
     corrects = torch.zeros(max_iters)
@@ -95,9 +95,9 @@ def test_default(net, testloader, iters, problem, device):
                         sampled_pred = predicted[j].view(-1, *in_shape)
                         sampled_target = targets[j].view(-1, *in_shape)
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / prod(in_shape) * 100
-                        reporting_data.append((wandb.Image(sampled_input.numpy()), wandb.Image(sampled_pred.numpy()), wandb.Image(sampled_target.numpy()), percentage_correct_bits))
+                        reporting_data.append((wandb.Image(sampled_input.numpy()), wandb.Image(sampled_pred.numpy()), wandb.Image(sampled_target.numpy()), percentage_correct_bits, test_type))
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
-            test_table = wandb.Table(data=reporting_data, columns=["input", "predicted", "labels", "percentage correct bits"])
+            test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "labels", "percentage correct bits", "test_type"])
             wandb.log({"sample_outputs": test_table})
             total += targets.size(0)
 

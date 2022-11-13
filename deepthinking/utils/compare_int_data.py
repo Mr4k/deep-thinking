@@ -36,7 +36,7 @@ class CompareIntDataset(torch.utils.data.Dataset):
         # with 4 bits
         # 8! * (16 choose 8) inputs = a lot
         # (16 choose 8) solutions = 12870
-        num_bits = 4
+        num_bits = 6
         self.inputs = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
         self.targets = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
         

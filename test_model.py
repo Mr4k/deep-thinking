@@ -78,12 +78,12 @@ def main(cfg: DictConfig):
                                      cfg.problem.model.test_iterations["high"] + 1))
 
     if cfg.quick_test:
-        test_acc = dt.test(net, [loaders["test"]], cfg.problem.hyp.test_mode, test_iterations, cfg.problem.name, device)
+        test_acc = dt.test(net, [(loaders["test"], "test")], cfg.problem.hyp.test_mode, test_iterations, cfg.problem.name, device)
         test_acc = test_acc[0]
         val_acc, train_acc = None, None
     else:
         test_acc, val_acc, train_acc = dt.test(net,
-                                               [loaders["test"], loaders["val"], loaders["train"]],
+                                               [(loaders["test"], "test"), (loaders["val"], "val"), (loaders["train"], "train")],
                                                cfg.problem.hyp.test_mode,
                                                test_iterations,
                                                cfg.problem.name, device)
