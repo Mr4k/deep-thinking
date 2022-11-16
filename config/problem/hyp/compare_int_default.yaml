@@ -5,7 +5,7 @@ lr: 0.001
 lr_decay: step
 lr_factor: 0.1
 lr_schedule:
-  - 100
+  - 500
 lr_throttle: True
 optimizer: adam
 save_period: -1

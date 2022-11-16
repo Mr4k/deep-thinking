@@ -9,6 +9,7 @@
     October 2021
 """
 
+from distutils.command.build_scripts import first_line_re
 import einops
 import torch
 from icecream import ic
@@ -76,13 +77,15 @@ def test_default(net, testloader, iters, problem, device, test_type):
     corrects = torch.zeros(max_iters)
     total = 0
 
+    reporting_data = []
+
+    first_batch = True
     with torch.no_grad():
         for inputs, targets in tqdm(testloader, leave=False):
             inputs, targets = inputs.to(device), targets.to(device)
 
             all_outputs = net(inputs, iters_to_do=max_iters)
 
-            reporting_data = []
             batch_size = inputs.shape[0]
             num_data_pieces_to_report = min(10, batch_size) 
             for i in range(all_outputs.size(1)):
@@ -90,7 +93,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                 predicted = get_predicted(inputs, outputs, problem)
                 targets = targets.view(targets.size(0), -1)
 
-                if i == all_outputs.size(1) - 1:
+                if i == all_outputs.size(1) - 1 and first_batch:
                     for j in range(num_data_pieces_to_report):
                         in_shape = inputs[j].shape[0:]
                         sampled_input = inputs[j,0].int()
@@ -98,10 +101,12 @@ def test_default(net, testloader, iters, problem, device, test_type):
                         sampled_target = targets[j].view(-1, *in_shape)
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
                         reporting_data.append((wandb.Image(sampled_input.cpu().numpy()), wandb.Image(sampled_pred.cpu().numpy()), wandb.Image(sampled_target.cpu().numpy()), percentage_correct_bits, test_type))
+                    first_batch = False
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
-            test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "labels", "percentage correct bits", "test_type"])
-            wandb.log({"sample_outputs": test_table})
             total += targets.size(0)
+    
+    test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "labels", "percentage correct bits", "test_type"])
+    wandb.log({"sample_outputs": test_table})
 
     accuracy = 100.0 * corrects / total
     ret_acc = {}
