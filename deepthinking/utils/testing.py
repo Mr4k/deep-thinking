@@ -75,7 +75,6 @@ def test_default(net, testloader, iters, problem, device, test_type):
             inputs, targets = inputs.to(device), targets.to(device)
 
             all_outputs = net(inputs, iters_to_do=max_iters)
-            print("outs:", all_outputs.shape)
 
             batch_size = inputs.shape[0]
             num_data_pieces_to_report = min(10, batch_size) 
@@ -100,7 +99,6 @@ def test_default(net, testloader, iters, problem, device, test_type):
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
                         
                     stacked = np.stack(predicted_vid, axis=0)
-                    print("stacccked:", stacked.shape)
                     reporting_data.append((
                         wandb.Image(sampled_input.cpu().numpy()),
                         wandb.Image(sampled_pred.cpu().numpy()),

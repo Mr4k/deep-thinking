@@ -1,11 +1,13 @@
-alpha: 1
+alpha: 0.5
 clip:
 epochs: 1000
 lr: 0.001
 lr_decay: step
-lr_factor: 0.1
+lr_factor: 0.5
 lr_schedule:
-  - 500
+  - 400
+  - 600
+  - 800
 lr_throttle: True
 optimizer: adam
 save_period: -1

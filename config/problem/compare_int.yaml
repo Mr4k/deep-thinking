@@ -4,11 +4,11 @@ defaults:
 
 name: compare_int
 test_data: 32
-train_data: 8
+train_data: 16
 
 model:
-  width: 128
+  width: 256
   max_iters: 50 
   test_iterations:
-    low: 50
+    low: 0
     high: 300
