@@ -89,6 +89,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                     predicted_vid = []
                     for i in range(all_outputs.size(1)):
                         outputs = all_outputs[:, i]
+                        print("zzzz:", outputs.shape)
                         predicted = get_predicted(inputs, outputs, problem)
                         in_shape = inputs[j].shape[1:]
                         sampled_input = inputs[j,0].int()
