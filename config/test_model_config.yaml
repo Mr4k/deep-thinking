@@ -13,6 +13,10 @@ hydra:
 
 name: testing_default
 
+wandb:
+  entity: mr4k
+  project: deepthinking-test
+
 problem:
   model:
     test_iterations:
