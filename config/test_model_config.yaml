@@ -20,8 +20,8 @@ wandb:
 problem:
   model:
     test_iterations:
-      low: 30
-      high: 50
+      low: 0
+      high: 300
     model_path:
 
 quick_test: False
