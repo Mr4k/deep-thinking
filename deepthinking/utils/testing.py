@@ -97,7 +97,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
 
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
                         
-                    stacked = np.stack(predicted_vid, axis=-1)
+                    stacked = np.stack(predicted_vid, axis=0)
                     print("stacccked:", stacked.shape)
                     reporting_data.append((
                         wandb.Image(sampled_input.cpu().numpy()),
