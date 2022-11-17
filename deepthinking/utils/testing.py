@@ -91,7 +91,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                         outputs = all_outputs[:, i]
                         print("zzzzz:", outputs.shape)
                         predicted = get_predicted(inputs, outputs, problem)
-                        print("ppppp:", predicted)
+                        print("ppppp:", predicted.shape)
                         in_shape = inputs[j].shape[1:]
                         sampled_input = inputs[j,0].int()
                         sampled_pred = predicted[j].view(-1, *in_shape)
