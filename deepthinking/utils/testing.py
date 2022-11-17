@@ -94,9 +94,8 @@ def test_default(net, testloader, iters, problem, device, test_type):
                         sampled_input = inputs[j,0].int()
                         sampled_pred = predicted[j].view(-1, *in_shape)
                         sampled_target = targets[j].view(-1, *in_shape)
-                        frame = sampled_pred.cpu().numpy().copy() * 256
+                        frame = sampled_pred.cpu().numpy().copy() * 255
                         predicted_vid.append(frame)
-                        print(frame)
 
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
                         
