@@ -100,7 +100,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                     reporting_data.append((
                         wandb.Image(sampled_input.cpu().numpy()),
                         wandb.Image(sampled_pred.cpu().numpy()),
-                        wandb.Video(np.stack(predicted_vid), axis=-1),
+                        wandb.Video(np.stack(predicted_vid, axis=-1)),
                         wandb.Image(sampled_target.cpu().numpy()),
                         percentage_correct_bits,
                         test_type))
