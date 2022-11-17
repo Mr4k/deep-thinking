@@ -57,19 +57,6 @@ def get_predicted(inputs, outputs, problem):
 
     return predicted
 
-"""def log_eval_result(predicted, targets):
-    my_data = [
-        [0, wandb.Image("img_0.jpg"), 0, 0],
-        [1, wandb.Image("img_1.jpg"), 8, 0],
-        [2, wandb.Image("img_2.jpg"), 7, 1],
-        [3, wandb.Image("img_3.jpg"), 1, 1]
-    ]
-          
-    # create a wandb.Table() with corresponding columns
-    columns=["id", "image", "prediction", "truth"]
-    test_table = wandb.Table(data=my_data, columns=columns)
-    wandb.log(test_table)"""
-
 
 def test_default(net, testloader, iters, problem, device, test_type):
     max_iters = max(iters)

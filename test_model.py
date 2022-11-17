@@ -22,6 +22,8 @@ from omegaconf import DictConfig, OmegaConf
 
 import deepthinking as dt
 
+import wandb
+
 # Ignore statements for pylint:
 #     Too many branches (R0912), Too many statements (R0915), No member (E1101),
 #     Not callable (E1102), Invalid name (C0103), No exception (W0702),
@@ -31,6 +33,9 @@ import deepthinking as dt
 
 @hydra.main(config_path="config", config_name="test_model_config")
 def main(cfg: DictConfig):
+    wandb.config = OmegaConf.to_container(
+        cfg, resolve=True, throw_on_missing=True
+    )
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.backends.cudnn.benchmark = True
     if cfg.problem.hyp.save_period is None:
@@ -39,6 +44,12 @@ def main(cfg: DictConfig):
     log.info("\n_________________________________________________\n")
     log.info("test_model.py main() running.")
     log.info(OmegaConf.to_yaml(cfg))
+
+    _ = wandb.init(
+        entity=cfg.wandb.entity,
+        project=cfg.wandb.project,
+        settings=wandb.Settings(start_method="thread"),
+        config=wandb.config)
 
     training_args = OmegaConf.load(os.path.join(cfg.problem.model.model_path, ".hydra/config.yaml"))
     cfg_keys_to_load = [("hyp", "alpha"),
