@@ -89,14 +89,14 @@ def test_default(net, testloader, iters, problem, device, test_type):
                     predicted_vid = []
                     for i in range(all_outputs.size(1)):
                         outputs = all_outputs[:, i]
-                        print("zzzzz:", outputs.shape)
                         predicted = get_predicted(inputs, outputs, problem)
-                        print("ppppp:", predicted.shape)
                         in_shape = inputs[j].shape[1:]
                         sampled_input = inputs[j,0].int()
                         sampled_pred = predicted[j].view(-1, *in_shape)
                         sampled_target = targets[j].view(-1, *in_shape)
-                        predicted_vid.append(sampled_pred.cpu().numpy() * 256)
+                        frame = sampled_pred.cpu().numpy().copy() * 256
+                        predicted_vid.append(frame)
+                        print(frame)
 
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
                         
