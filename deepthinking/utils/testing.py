@@ -11,10 +11,13 @@
 
 from distutils.command.build_scripts import first_line_re
 import einops
+from matplotlib.pyplot import axis
 import torch
 from icecream import ic
 from tqdm import tqdm
 import wandb
+
+import numpy as np
 
 from functools import reduce # Valid in Python 2.6+, required in Python 3
 import operator
@@ -79,20 +82,32 @@ def test_default(net, testloader, iters, problem, device, test_type):
                 outputs = all_outputs[:, i]
                 predicted = get_predicted(inputs, outputs, problem)
                 targets = targets.view(targets.size(0), -1)
-
-                if i == all_outputs.size(1) - 1 and first_batch:
-                    for j in range(num_data_pieces_to_report):
+                corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
+            if first_batch:
+                for j in range(num_data_pieces_to_report):
+                    predicted_vid = []
+                    for i in range(all_outputs.size(1)):
+                        outputs = all_outputs[:, i]
+                        predicted = get_predicted(inputs, outputs, problem)
                         in_shape = inputs[j].shape[0:]
                         sampled_input = inputs[j,0].int()
                         sampled_pred = predicted[j].view(-1, *in_shape)
                         sampled_target = targets[j].view(-1, *in_shape)
+                        predicted_vid.append(sampled_pred)
+
                         percentage_correct_bits = (sampled_pred == sampled_target).sum() / reduce(operator.mul, in_shape, 1) * 100
-                        reporting_data.append((wandb.Image(sampled_input.cpu().numpy()), wandb.Image(sampled_pred.cpu().numpy()), wandb.Image(sampled_target.cpu().numpy()), percentage_correct_bits, test_type))
-                    first_batch = False
-                corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
+                        
+                    reporting_data.append((
+                        wandb.Image(sampled_input.cpu().numpy()),
+                        wandb.Image(sampled_pred.cpu().numpy()),
+                        wandb.Video(np.stack(predicted_vid), axis=-1),
+                        wandb.Image(sampled_target.cpu().numpy()),
+                        percentage_correct_bits,
+                        test_type))
+                first_batch = False
             total += targets.size(0)
     
-    test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "labels", "percentage correct bits", "test_type"])
+    test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "animated pred", "labels", "percentage correct bits", "test_type"])
     wandb.log({"sample_outputs": test_table})
 
     accuracy = 100.0 * corrects / total
