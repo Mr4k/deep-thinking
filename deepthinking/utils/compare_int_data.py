@@ -31,8 +31,7 @@ def convert_int_to_bits(num, num_bits = 8):
 class CompareIntDataset(torch.utils.data.Dataset):
     base_folder = "compare_int_data"
 
-    def __init__(self, root: str, num_items: int = 8) -> None:
-        num_examples = 100000
+    def __init__(self, root: str, num_items: int = 8, num_examples = 10000) -> None:
         # with 4 bits
         # 8! * (16 choose 8) inputs = a lot
         # (16 choose 8) solutions = 12870
@@ -68,10 +67,10 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
 
 def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, test_data,
-                          train_split=0.8, shuffle=True):
+                          train_split=0.8, train_and_val_examples=50000, test_examples=3000, shuffle=True):
 
-    dataset = CompareIntDataset("../../../data", num_items=train_data)
-    testset = CompareIntDataset("../../../data", num_items=test_data)
+    dataset = CompareIntDataset("../../../data", num_items=train_data, num_examples=train_and_val_examples)
+    testset = CompareIntDataset("../../../data", num_items=test_data, num_examples=test_examples)
 
     train_split = int(train_split * len(dataset))
 
