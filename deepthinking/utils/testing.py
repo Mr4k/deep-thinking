@@ -122,8 +122,9 @@ def test_default(net, testloader, iters, problem, device, test_type):
 
     avg_dict = {}
     for iter, sum_pct in sum_percentage_correct_bits_over_all_batches.items():
-        avg_dict[("avg_percentage_correct_bits_" + test_type + "_" + str(iter) + "_iters")] =  sum_pct / total_batches[iter]
-    wandb.log({"sample_outputs": test_table}.update(avg_dict))
+        avg_dict[("avg_percentage_correct_bits_" + test_type + "_" + str(iter) + "_iters")] = sum_pct / total_batches[iter]
+    avg_dict["sample_outputs"] = test_table
+    wandb.log(avg_dict)
 
     accuracy = 100.0 * corrects / total
     ret_acc = {}
