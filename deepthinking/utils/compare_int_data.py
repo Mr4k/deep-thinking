@@ -87,6 +87,6 @@ def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, te
                                 shuffle=False, drop_last=False)
     test16loader = data.DataLoader(testset_16, num_workers=0, batch_size=test_batch_size,
                                 shuffle=False, drop_last=False)
-    loaders = {"train": trainloader, "test": testloader, "val": valloader, "test_16": test16loader}
+    loaders = {"train": trainloader, "test": testloader, "val": valloader, "test16": test16loader}
 
     return loaders
