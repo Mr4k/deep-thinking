@@ -66,7 +66,7 @@ class CompareIntDataset(torch.utils.data.Dataset):
 
 
 def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, test_data,
-                          train_split=0.8, train_and_val_examples=500, test_examples=500, shuffle=True):
+                          train_split=0.8, train_and_val_examples=1000000, test_examples=10000, shuffle=True):
 
     dataset = CompareIntDataset("../../../data", num_items=train_data, num_examples=train_and_val_examples)
     testset = CompareIntDataset("../../../data", num_items=test_data, num_examples=test_examples)
