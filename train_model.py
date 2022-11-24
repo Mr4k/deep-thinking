@@ -116,7 +116,7 @@ def main(cfg: DictConfig):
 
         # evaluate the model periodically and at the final epoch
         if (epoch + 1) % cfg.problem.hyp.val_period == 0 or epoch + 1 == cfg.problem.hyp.epochs:
-            test_acc, val_acc = dt.test(net,
+            test_acc, val_acc, test16_acc = dt.test(net,
                                                    [(loaders["test"], "test"),
                                                     (loaders["val"], "val"),
                                                     (loaders["test16"], "test16")],
@@ -126,15 +126,17 @@ def main(cfg: DictConfig):
                                                    device)
             log.info(f"Val accuracy: {val_acc}")
             log.info(f"Test accuracy (hard data): {test_acc}")
+            log.info(f"Test16 accuracy (hard data): {test16_acc}")
             tb_last = cfg.problem.model.test_iterations[-1]
             wandb.log({
                 "eval_epoch": epoch,
                 "eval_val_acc": {tb_last: val_acc[tb_last]},
-                "test_acc_hard": {tb_last: test_acc[tb_last]}
+                "test_acc_hard": {tb_last: test_acc[tb_last]},
+                "test16_acc_hard": {tb_last: test16_acc[tb_last]}
             })
 
-            lg.write_to_tb([val_acc[tb_last], test_acc[tb_last]],
-                           ["val_acc", "test_acc"],
+            lg.write_to_tb([val_acc[tb_last], test_acc[tb_last], test16_acc[tb_last]],
+                           ["val_acc", "test_acc", "test16_acc"],
                            epoch,
                            writer)
         # check to see if we should save
