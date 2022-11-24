@@ -117,6 +117,11 @@ def test_default(net, testloader, iters, problem, device, test_type):
             total += targets.size(0)
     
     test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "animated pred", "labels", "percentage correct bits", "test_type"])
+    print("out----")
+    print(test_type)
+    print(max_iters)
+    print(sum_percentage_correct_bits_over_all_iters)
+    print(total_iters)
     wandb.log({
         "sample_outputs": test_table,
         ["avg_percentage_correct_bits_" + test_type + "_" + str(max_iters) + "_iters"]: sum_percentage_correct_bits_over_all_iters / total_iters
