@@ -71,6 +71,9 @@ def test_default(net, testloader, iters, problem, device, test_type):
 
     first_batch = True
     with torch.no_grad():
+        sum_percentage_correct_bits_over_all_iters = 0
+        total_iters = 0
+
         for inputs, targets in tqdm(testloader, leave=False):
             inputs, targets = inputs.to(device), targets.to(device)
 
@@ -83,6 +86,10 @@ def test_default(net, testloader, iters, problem, device, test_type):
                 predicted = get_predicted(inputs, outputs, problem)
                 targets = targets.view(targets.size(0), -1)
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
+                percentage_correct_bits = (predicted == targets).sum() / reduce(operator.mul, targets.shape, 1) * 100
+
+                sum_percentage_correct_bits_over_all_iters += percentage_correct_bits
+                total_iters += 1
             if first_batch:
                 for j in range(num_data_pieces_to_report):
                     predicted_vid = []
@@ -110,7 +117,10 @@ def test_default(net, testloader, iters, problem, device, test_type):
             total += targets.size(0)
     
     test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "animated pred", "labels", "percentage correct bits", "test_type"])
-    wandb.log({"sample_outputs": test_table})
+    wandb.log({
+        "sample_outputs": test_table,
+        ["avg_percentage_correct_bits_" + test_type + "_" + max_iters + "_iters"]: sum_percentage_correct_bits_over_all_iters / total_iters
+    })
 
     accuracy = 100.0 * corrects / total
     ret_acc = {}
