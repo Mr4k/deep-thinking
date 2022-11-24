@@ -74,7 +74,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
     with torch.no_grad():
         sum_percentage_correct_bits_over_all_batches = defaultdict(lambda:0)
         total_batches = defaultdict(lambda:0)
-        record_iters = [15, 50, 175, 300]
+        record_iters = [24, 49, 174, 299]
 
         for inputs, targets in tqdm(testloader, leave=False):
             inputs, targets = inputs.to(device), targets.to(device)
