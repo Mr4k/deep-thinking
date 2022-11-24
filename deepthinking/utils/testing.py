@@ -9,6 +9,7 @@
     October 2021
 """
 
+from collections import defaultdict
 from distutils.command.build_scripts import first_line_re
 import einops
 from matplotlib.pyplot import axis
@@ -71,8 +72,9 @@ def test_default(net, testloader, iters, problem, device, test_type):
 
     first_batch = True
     with torch.no_grad():
-        sum_percentage_correct_bits_over_all_iters = 0
-        total_iters = 0
+        sum_percentage_correct_bits_over_all_batches = defaultdict(0)
+        total_batches = defaultdict(0)
+        record_iters = [15, 50, 175, 300]
 
         for inputs, targets in tqdm(testloader, leave=False):
             inputs, targets = inputs.to(device), targets.to(device)
@@ -86,10 +88,10 @@ def test_default(net, testloader, iters, problem, device, test_type):
                 predicted = get_predicted(inputs, outputs, problem)
                 targets = targets.view(targets.size(0), -1)
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
-                percentage_correct_bits = (predicted == targets).sum().item() / reduce(operator.mul, targets.shape, 1) * 100
-
-                sum_percentage_correct_bits_over_all_iters += percentage_correct_bits
-                total_iters += 1
+                if i in record_iters:
+                    percentage_correct_bits = (predicted == targets).sum().item() / reduce(operator.mul, targets.shape, 1) * 100
+                    sum_percentage_correct_bits_over_all_batches[record_iters] += percentage_correct_bits
+                    total_batches[record_iters] += 1
             if first_batch:
                 for j in range(num_data_pieces_to_report):
                     predicted_vid = []
@@ -117,10 +119,11 @@ def test_default(net, testloader, iters, problem, device, test_type):
             total += targets.size(0)
     
     test_table = wandb.Table(data=reporting_data, columns=["inputs", "predicted", "animated pred", "labels", "percentage correct bits", "test_type"])
-    wandb.log({
-        "sample_outputs": test_table,
-        ("avg_percentage_correct_bits_" + test_type + "_" + str(max_iters) + "_iters"): sum_percentage_correct_bits_over_all_iters / total_iters
-    })
+
+    avg_dict = {}
+    for iter, sum_pct in sum_percentage_correct_bits_over_all_batches.items():
+        avg_dict[("avg_percentage_correct_bits_" + test_type + "_" + str(iter) + "_iters")] =  sum_pct / total_batches[iter]
+    wandb.log({"sample_outputs": test_table}.update(avg_dict))
 
     accuracy = 100.0 * corrects / total
     ret_acc = {}
