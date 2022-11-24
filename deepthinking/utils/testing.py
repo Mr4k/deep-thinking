@@ -90,8 +90,8 @@ def test_default(net, testloader, iters, problem, device, test_type):
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
                 if i in record_iters:
                     percentage_correct_bits = (predicted == targets).sum().item() / reduce(operator.mul, targets.shape, 1) * 100
-                    sum_percentage_correct_bits_over_all_batches[record_iters] += percentage_correct_bits
-                    total_batches[record_iters] += 1
+                    sum_percentage_correct_bits_over_all_batches[i] += percentage_correct_bits
+                    total_batches[i] += 1
             if first_batch:
                 for j in range(num_data_pieces_to_report):
                     predicted_vid = []
