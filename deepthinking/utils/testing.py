@@ -86,7 +86,7 @@ def test_default(net, testloader, iters, problem, device, test_type):
                 predicted = get_predicted(inputs, outputs, problem)
                 targets = targets.view(targets.size(0), -1)
                 corrects[i] += torch.amin(predicted == targets, dim=[1]).sum().item()
-                percentage_correct_bits = (predicted == targets).sum() / reduce(operator.mul, targets.shape, 1) * 100
+                percentage_correct_bits = (predicted == targets).sum().item() / reduce(operator.mul, targets.shape, 1) * 100
 
                 sum_percentage_correct_bits_over_all_iters += percentage_correct_bits
                 total_iters += 1
