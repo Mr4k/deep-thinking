@@ -118,7 +118,8 @@ def main(cfg: DictConfig):
         if (epoch + 1) % cfg.problem.hyp.val_period == 0 or epoch + 1 == cfg.problem.hyp.epochs:
             test_acc, val_acc = dt.test(net,
                                                    [(loaders["test"], "test"),
-                                                    (loaders["val"], "val")],
+                                                    (loaders["val"], "val"),
+                                                    (loaders["test16"], "test16")],
                                                    cfg.problem.hyp.test_mode,
                                                    cfg.problem.model.test_iterations,
                                                    cfg.problem.name,

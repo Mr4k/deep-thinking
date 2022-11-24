@@ -31,11 +31,10 @@ def convert_int_to_bits(num, num_bits = 8):
 class CompareIntDataset(torch.utils.data.Dataset):
     base_folder = "compare_int_data"
 
-    def __init__(self, root: str, num_items: int = 8, num_examples = 10000) -> None:
+    def __init__(self, root: str, num_items: int = 8, num_examples = 10000, num_bits = 8) -> None:
         # with 4 bits
         # 8! * (16 choose 8) inputs = a lot
         # (16 choose 8) solutions = 12870
-        num_bits = 8
         self.inputs = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
         self.targets = torch.zeros((num_examples, 1, num_items, num_bits), dtype=torch.long)
         
@@ -71,6 +70,7 @@ def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, te
 
     dataset = CompareIntDataset("../../../data", num_items=train_data, num_examples=train_and_val_examples)
     testset = CompareIntDataset("../../../data", num_items=test_data, num_examples=test_examples)
+    testset_16 = CompareIntDataset("../../../data", num_items=train_data, num_examples=test_examples, num_bits=16)
 
     train_split = int(train_split * len(dataset))
 
@@ -85,6 +85,8 @@ def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, te
                                  shuffle=False, drop_last=False)
     valloader = data.DataLoader(valset, num_workers=0, batch_size=test_batch_size,
                                 shuffle=False, drop_last=False)
-    loaders = {"train": trainloader, "test": testloader, "val": valloader}
+    test16loader = data.DataLoader(testset_16, num_workers=0, batch_size=test_batch_size,
+                                shuffle=False, drop_last=False)
+    loaders = {"train": trainloader, "test": testloader, "val": valloader, "test_16": test16loader}
 
     return loaders
