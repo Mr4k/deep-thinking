@@ -3,7 +3,7 @@ defaults:
   - model: dt_net_recall_2d
 
 name: compare_int
-test_data: 32
+test_data: 64
 train_data: 16
 
 model:
