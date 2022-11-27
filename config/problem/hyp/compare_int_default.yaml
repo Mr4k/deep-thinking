@@ -10,9 +10,9 @@ lr_schedule:
 lr_throttle: True
 optimizer: adam
 save_period: -1
-test_batch_size: 600
+test_batch_size: 800
 test_mode: default
-train_batch_size: 600
+train_batch_size: 800
 train_mode: progressive
 val_period: 10
 warmup_period: 10

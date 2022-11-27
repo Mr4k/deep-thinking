@@ -42,7 +42,7 @@ def prepare_compare_int_loader(train_batch_size, test_batch_size, train_data, te
                           train_split=0.8, shuffle=True):
 
     # train_1000000_examples_16_items_8_bits
-    trainset = CompareIntDataset("../../../data", "val_10000_examples_16_items_8_bits")
+    trainset = CompareIntDataset("../../../data", "train_1000000_examples_16_items_8_bits")
     valset = CompareIntDataset("../../../data", "val_10000_examples_16_items_8_bits")
     testset_big = CompareIntDataset("../../../data", "test_big_10000_examples_64_items_8_bits")
     testset_long = CompareIntDataset("../../../data", "test_long_10000_examples_16_items_16_bits")

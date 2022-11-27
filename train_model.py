@@ -159,7 +159,6 @@ def main(cfg: DictConfig):
                          ("test_iters", list(cfg.problem.model.test_iterations)),
                          ("test_mode", cfg.problem.hyp.test_mode),
                          ("train_data", cfg.problem.train_data),
-                         ("train_acc", train_acc),
                          ("val_acc", val_acc)])
     with open(os.path.join("stats.json"), "w") as fp:
         json.dump(stats, fp)
